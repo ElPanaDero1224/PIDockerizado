@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="{{ icon }}">
+    <title>{{ titulo }}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/CSS/index.css">
+    <style>
+        .carousel-inner img {
+            height: 600px;
+            object-fit: cover;
+        }
+        .about-section {
+            background-color: #f8f9fa;
+            padding: 40px 0;
+        }
+        .about-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        .about-content img {
+            border-radius: 10px;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{{ url_for('static', filename='images/tlogo.png') }}" style="cursor: pointer" onclick="volver()" alt="Logo" height="40px">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item" style="display: {% if usuario_logeado%}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="{{ url_for('userhome') }}">Hola! {{ nombre }}</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==1 %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/crud">CRUD</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and (tipouser==3 or tipouser==1)%}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="{{ url_for('HomeEmpresa') }}">Ir al HomeEmpresa </a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and (tipouser==1 or tipouser==2) %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="{{ url_for('Home') }}">HOME</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}none{% else %}block{% endif %}">
+                        <a class="nav-link" href="{{ url_for('login') }}">Iniciar sesión</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="{{ url_for('logout') }}">Cerrar sesión</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==3 %}none{% else %}block{% endif %}">
+                        <a class="nav-link" href="{{ url_for('Convocatorias') }}">Convocatorias</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('about') }}">Conócenos</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <div class="alert alert-info" role="alert">
+                                {% for message in messages %}
+                                    {{ message }}
+                                {% endfor %}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+    </header>
+
+
+
+    <!-- Carrusel -->
+    <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel" data-interval="3000">
+
+        <ol class="carousel-indicators">
+            <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+            <li data-target="#carouselExampleIndicators" data-slide-to="3"></li>
+        </ol>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img class="d-block w-100" src="../static/images/mar.jpg" alt="Primer slide">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Ayuda</h5>
+                    <h6>Pon tu granito de arena</h6>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block w-100" src="../static/images/im2.jpeg" alt="Segundo slide">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Explora</h5>
+                    <h6>Descubre la ofertas por parte de multples empresas</h6>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block w-100" src="../static/images/work2.jpg" alt="Tercer slide">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Conoce</h5>
+                    <h6>Organiza nuevos equipos de trabajo</h6>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="d-block w-100" src="../static/images/work.jpg" alt="Cuarto slide">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>Encuentra</h5>
+                    <h6>Busca lo que te apasiona</h6>
+                </div>
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Anterior</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Siguiente</span>
+        </a>
+    </div>
+
+    <!-- Secciones adicionales -->
+    <div class="container my-5">
+        <div class="row">
+            <div class="col-md-4">
+                <h3>Descubre ></h3>
+                <p>Interactua con empresas de todo el mundo</p>
+            </div>
+            <div class="col-md-4">
+                <h3>Aprende ></h3>
+                <p>Participa en las diversas convocatorias</p>
+            </div>
+            <div class="col-md-4">
+                <h3>Decide</h3>
+                <p>Utiliza esos acercamientos para planear tu futuro</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sección "Quienes somos" -->
+    <div class="about-section">
+            <div class="row about-content">
+                <div class="col-md-6">
+                    <h2>Quienes somos</h2>
+                    <p>Somos una pequeña empresa enfocada en los estudiantes, el objetivo es brindar a los jóvenes su primer acercamiento con la empresa.</p>
+                    <br>
+                    <p>Sabemos que encontrar un trabajo despues de graduarse suele ser dificil , y
+                        mas aun nuendo no se tiene alguna expericia previa, por eso el objetivo de esta pagina es crear ese primer
+                        acercamiento con las empresas, mediante actividades de voluntariado.
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <img src="../static/images/estudets.jpg" alt="Imagen de estudiantes">
+                </div>
+            </div>
+    </div>
+
+     <div class="about-section">
+            <div class="row about-content">
+                <div class="col-md-6">
+                    <h2>Como funciona</h2>
+
+                    <p>
+                        Las empresas acuden a nosotros cuando necesitan personal ,ya sea para pequeños trabajos
+                        o grandes proyectos.
+                        Nosotros hacemos visible esa convocatoria con los requisistos que cuenta con la empresa
+                        para despues publicar convocatorias y asi personas de varias partes de el mundo
+                        puedan enterarse.
+
+                        En el caso que esten interesados , se podran registrar en esa convocatoria y si cumplen con los
+                        requisitos la empresa lo contactara
+                    </p>
+                    <a href="/Convocatorias">Ver convocatorias</a>
+                </div>
+                <div class="col-md-6">
+                    <img src="../static/images/cosa.jpg" alt="Imagen de estudiantes">
+                </div>
+            </div>
+    </div>
+
+    <footer class="bg-light text-center py-3">
+        <p>&copy; 2024 TerraForce. Todos los derechos reservados.</p>
+    </footer>
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ icon }}">
+    <title>{{ titulo }}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="../static/CSS/index.css">
+    <style>
+        .convocatoria-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+        }
+        .convocatoria-card-header {
+            background-color: #28a745;
+            color: white;
+            padding: 10px;
+            border-top-left-radius: 8px;
+            border-top-right-radius: 8px;
+            font-weight: bold;
+        }
+        .convocatoria-card-body {
+            padding: 10px;
+        }
+        .convocatoria-actions {
+            display: flex;
+            justify-content: space-between;
+        }
+        .convocatoria-actions button {
+            margin-right: 10px;
+        }
+        .btn-register {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+        .btn-register:hover {
+            background-color: #218838;
+            color: white;
+            text-decoration: none;
+        }
+
+             .img-preview {
+    max-width: 300px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 5px;
+  }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{{ url_for('static', filename='images/tlogo.png') }}" style="cursor: pointer" onclick="volver()" alt="Logo" height="40px">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item" style="display: {% if usuario_logeado %}block{% else %}none{% endif %}">
+                        <a>Hola! {{ nombre }}</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==1 %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/crud">CRUD</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==1 %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/HomeEmpresa">Home/Empresa</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==1 %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/Home">Home/Usuario</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}none{% else %}block{% endif %}">
+                        <a class="nav-link" href="/registro">Registro</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}none{% else %}block{% endif %}">
+                        <a class="nav-link" href="/login">Iniciar sesión</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/logout">Cerrar sesión</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==1%}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/Convocatorias">Convocatorias</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Conócenos</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container my-5">
+        <div class="section">
+            <h2>Mis Convocatorias</h2>
+            {% if results %}
+                {% for convocatoria in results %}
+                    <div class="convocatoria-card">
+                        <div class="convocatoria-card-header">
+                            Convocatoria {{ convocatoria[1] }}
+                        </div>
+                        <div class="convocatoria-card-body">
+                            <p>Creado por: {{ convocatoria[8] }}</p>
+                            <p>Temática: {{ convocatoria[10] }}</p>
+                            {% if convocatoria.id in imagenes %}
+                                <img src="data:{{ imagenes[convocatoria.id].mime_type }};base64,{{ imagenes[convocatoria.id].img_base64 }}" alt="imagen" class="img-preview">
+                                {% else %}
+                         <p>No hay imagen disponible</p>
+                            {% endif %}
+                            <p>Requisitos: {{ convocatoria[2] }}</p>
+                            <p>Fecha de cierre: {{ convocatoria[7] }}</p>
+                            <div class="convocatoria-actions">
+                                <button class="btn btn-primary" data-toggle="modal" data-target="#detallesModal{{ convocatoria[0] }}">Más detalles</button>
+                                 <a href="{{ url_for('editarConvo', idconvo=convocatoria[0]) }}" class="btn btn-warning">Modificar convocatoria</a>
+                                 <a href="{{ url_for('verUsuarios', idconvo=convocatoria[0]) }}" class="btn btn-info">Ver usuarios registrados</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Modal de detalles -->
+                    <div class="modal fade" id="detallesModal{{ convocatoria[0] }}" tabindex="-1" role="dialog" aria-labelledby="detallesModalLabel{{ convocatoria[0] }}" aria-hidden="true">
+                        <div class="modal-dialog" role="document">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="detallesModalLabel{{ convocatoria[0] }}">Detalles de Convocatoria {{ convocatoria[1] }}</h5>
+                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                                <div class="modal-body">
+                                    <p><strong>Creado por:</strong> {{ convocatoria[8] }}</p>
+                                    <p><strong>Temática:</strong> {{ convocatoria[10] }}</p>
+                                    <p><strong>Requisitos:</strong> {{ convocatoria[2] }}</p>
+                                    <p><strong>Fecha de cierre:</strong> {{ convocatoria[7] }}</p>
+                                    <p><strong>Descripción:</strong> {{ convocatoria[3] }}</p>
+                                    <p><strong>Empresa:</strong> {{ convocatoria[9] }}</p>
+                                    <p><strong>Estatus:</strong> {{ convocatoria[10] }}</p>
+                                    <p><strong>Usuarios Registrados:</strong> {{ convocatoria[4] }} de {{ convocatoria[5] }}</p>
+                                    <p><strong>Fecha de inicio:</strong> {{ convocatoria[6] }}</p>
+                                    <!-- Agrega aquí cualquier otro detalle relevante -->
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>No hay convocatorias disponibles.</p>
+            {% endif %}
+        </div>
+        <a href="{{ url_for('registro_convocatoria') }}" class="btn btn-register mt-3">Registrar nueva convocatoria</a>
+    </div>
+
+
+
+
+    <script>
+        function volver(){
+            window.location.href='/'
+        }
+    </script>
+
+{#    Pa ver si si jalaaa#}
+{#    <h1>{{ imagenes }}</h1>#}
+{#    <h1>{{  nombre }}</h1>#}
+{#    <h1>{{ usuario_logeado  }}</h1>#}
+{#    <h1>{{ tipouser  }}</h1>#}
+
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

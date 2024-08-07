@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+     <link rel="icon" href="{{ icon }}">
+    <title>{{ titulo }}</title>
+    <link  href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style >
+        .img-preview {
+    max-width: 300px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 5px;
+  }
+
+    </style>
+</head>
+<body>
+<header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{{ url_for('static', filename='images/tlogo.png') }}" style="cursor: pointer" onclick="volver()" alt="Logo" height="40px">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item" style="display: {% if usuario_logeado %}block{% else %}none{% endif %}">
+                        <h2 class="nav-link">Hola! {{ nombre }}</h2>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                 <!-- los que tienen el block después del none, se ocultaran cuando el usuario esté loggeado -->
+                    <li class="nav-item" style="display: {% if usuario_logeado %}none{% else %}block{% endif %}">
+                        <a class="nav-link" href="/registro">Registro</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}none{% else %}block{% endif %}">
+                        <a class="nav-link" href="/login">Iniciar sesión</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/logout">Cerrar sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/Convocatorias">Convocatorias</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Conócenos</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+ {% with messages = get_flashed_messages() %}
+                        {% if messages %}
+                            <div class="alert alert-info" role="alert">
+                                {% for message in messages %}
+                                    {{ message }}
+                                {% endfor %}
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+
+
+{#<h1>Título de la Convocatoria: {{ tituloconv }}</h1>#}
+{#<h1>Vacantes: {{ vacantes }}</h1>#}
+{#<h1>Temáticas: {{ tematicas }}</h1>#}
+{#<h1>Requisitos: {{ requisitos }}</h1>#}
+{#<h1>Fecha de Cierre: {{ fechacierre }}</h1>#}
+{#<h1>Empresa: {{ empresa }}</h1>#}
+{#<h1>Tipo MIME: {{ mime_type }}</h1>#}
+{#<h1>ID de Usuario: {{ id_user }}</h1>#}
+{#<h1>ID de Empresa: {{ id_empresa }}</h1>#}
+
+<div class="container">
+    <form action="/post" method="POST" enctype="multipart/form-data">
+        <div class="card card-custom">
+            <div class="card-header card-header-custom" name="tituloconv">
+                {{ tituloconv }}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title"   >Creado por: {{ empresa }}</h5>
+                <p class="card-text">Temática: {{ tematicas }}</p>
+                <p class="card-text">Requisitos: {{ requisitos }}</p>
+                <p class="card-text">Vacantes: {{ vacantes }}</p>
+                <img src="data:{{ mime_type }};base64,{{ img_base64 }}" alt="Imagen Previa" class="img-preview "  >
+                <p class="card-text"><small class="text-muted">Fecha de cierre: {{ fechacierre }}</small></p>
+
+                <button class="btn btn-custom" type="submit">Aceptar</button>
+                 <button class="back-button" onclick="history.back()">Atras</button>
+
+            </div>
+             <input type="hidden" name="tituloconv" value="{{ tituloconv }}">
+            <input type="hidden" name="tematicas" value="{{ tematicas }}">
+            <input type="hidden" name="requisitos" value="{{ requisitos }}">
+            <input type="hidden" name="fechacierre" value="{{ fechacierre }}">
+            <input type="hidden" name="fechainicio" value="{{ fechainicio }}">
+            <input type="hidden" name="empresa" value="{{ empresa }}">
+            <input type="hidden" name="imagenbin" value="{{ img_base64 }}">
+            <input type="hidden" name="mime_type" value="{{ mime_type }}">
+            <input type="hidden" name="vacantes" value="{{ vacantes }}">
+            <input type="hidden" name="id_empresa" value="{{ id_empresa }}">
+            <input type="hidden" name="descripcion" value="{{ descripcion }}">
+            <input type="hidden" name="format_img" value="{{ format_img }}">
+
+        </div>
+        </form>
+</div>
+{#<h1>ID de Empresa: {{ imagenbin }}</h1>#}
+{#<h1>ID de Empresa: {{ img_data }}</h1>#}
+</body>
+
+</html>

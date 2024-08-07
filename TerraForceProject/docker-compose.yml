@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: TerraForceSQLServer
+    environment:
+      - SA_PASSWORD=UnaContraseñaMuyDifícil123!
+      - ACCEPT_EULA=Y
+    ports:
+      - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
+
+  python-app:
+    build: ./app
+    container_name: TerraForcePythonApp
+    ports:
+      - "5000:5000"  # Ajusta este puerto si tu aplicación usa otro puerto
+          
+    environment:
+      - SQL_SERVER=TerraForceSQLServer
+      - SQL_DATABASE=master
+      - SQL_USER=sa
+      - SQL_PASSWORD=UnaContraseñaMuyDifícil123!
+    volumes:
+      - ./app:/app
+    depends_on:
+      - sqlserver
+
+    command: >
+      sh -c "until nc -z sqlserver 1433; do
+              echo 'Waiting for SQL Server to be ready...';
+              sleep 1;
+             done;
+             flask run --host=0.0.0.0"
+
+volumes:
+  sqlserverdata:

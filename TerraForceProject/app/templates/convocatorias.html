@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="{{ url_for('static', filename=icon) }}">
+    <title>{{ titulo }}</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .navbar-custom {
+            background-color: #6FD557;
+        }
+        .card-custom {
+            margin-top: 20px;
+        }
+        .card-header-custom {
+            background-color: #6FD557;
+            color: white;
+        }
+        .btn-register {
+            background-color: #6FD557;
+            color: white;
+            margin-top: 20px;
+        }
+
+              .img-preview {
+    max-width: 300px;
+    max-height: 300px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 5px;
+  }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light sticky-top">
+            <a class="navbar-brand d-flex align-items-center" href="/">
+                <img src="{{ url_for('static', filename='images/tlogo.png') }}" style="cursor: pointer" onclick="volver()" alt="Logo" height="40px">
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item" style="display: {% if usuario_logeado%}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="{{ url_for('userhome') }}">Hola! {{ nombre }}</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==1 %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/crud">CRUD</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==1 %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/HomeEmpresa">Home/Empresa</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==1 %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/Home">Home/Usuario</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}none{% else %}block{% endif %}">
+                        <a class="nav-link" href="/registro">Registro</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}none{% else %}block{% endif %}">
+                        <a class="nav-link" href="/login">Iniciar sesión</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado and tipouser==2 %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/Home">HOME</a>
+                    </li>
+                    <li class="nav-item" style="display: {% if usuario_logeado %}block{% else %}none{% endif %}">
+                        <a class="nav-link" href="/logout">Cerrar sesión</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/about">Conócenos</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </header>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="flashes">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                            </button>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    <div class="container">
+        {% for convo in results %}
+        <div class="card card-custom">
+            <div class="card-header card-header-custom">
+                {{ convo.titulo }}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">Creado por: {{ convo.empresa_nombre }}</h5>
+                <p class="card-text">Temática: {{ convo.tematica }}</p>
+                <p class="card-text">Requisitos: {{ convo.requisitos }}</p>
+                {% set image_found = false %}
+            {% if convo.id in imagenes %}
+                <img src="data:{{ imagenes[convo.id].mime_type }};base64,{{ imagenes[convo.id].img_base64 }}" alt="imagen" class="img-preview">
+             {% else %}
+               <p>No hay imagen disponible</p>
+            {% endif %}
+                <p class="card-text"><small class="text-muted">Fecha de cierre: {{ convo.fecha_final }}</small></p>
+                <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#detailsModal{{ convo.id }}">
+                    Más detalles
+                </button>
+                <button type="button" class="btn btn-success" data-toggle="modal" data-target="#confirmModal{{ convo.id }}">
+                    Registrar
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal de detalles -->
+        <div class="modal fade" id="detailsModal{{ convo.id }}" tabindex="-1" aria-labelledby="detailsModalLabel{{ convo.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="detailsModalLabel{{ convo.id }}">{{ convo.titulo }}</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <h5 class="card-title">Creado por: {{ convo.empresa_nombre }}</h5>
+                        <p class="card-text">Temática: {{ convo.tematica }}</p>
+                        <p class="card-text">Requisitos: {{ convo.requisitos }}</p>
+                        <p class="card-text">Usuarios Registrados: {{ convo.usuarios_registrados }}</p>
+                        <p class="card-text">Límite de Usuarios: {{ convo.limite_usuarios }}</p>
+                        <p class="card-text">Fecha de Inicio: {{ convo.fecha_inicio }}</p>
+                        <p class="card-text">Fecha de Finalización: {{ convo.fecha_final }}</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-success" data-toggle="modal" data-target="#confirmModal{{ convo.id }}">Registrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de confirmación -->
+        <div class="modal fade" id="confirmModal{{ convo.id }}" tabindex="-1" aria-labelledby="confirmModalLabel{{ convo.id }}" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="confirmModalLabel{{ convo.id }}">Confirmar Registro</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        ¿Estás seguro de que deseas registrarte en la convocatoria "{{ convo.titulo }}"?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+                        <a href="{{ url_for('registrarse_convo', idconvo=convo.id) }}" class="btn btn-success">Confirmar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
